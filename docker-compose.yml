@@ -1,31 +1,49 @@
+# On donne le nom "wordpress" à ce container,
+# à partir de l'image "wordpress",
+# on le lie à notre bdd nommée "db",
+# sur le port 8081 de notre machine, qui pointe sur le port 80 de notre "container",
+# puis pour finir on copie le "volume".
+
 wordpress:
-  image: wordpress
-  links:
-    - db:mysql
-  ports:
-    - 8081:80
-  volumes:
-    # copy in path windows
-    - ~/Documents/docker/wordpress/:/var/www/html/
+image: wordpress
+links:
+- db:mysql
+ports:
+- 8081:80
+volumes:
+# copy in path windows
+- ~/Documents/docker/wordpress/:/var/www/html/
+
+# On donne le nom "wpmariadb" à ce container,
+# à partir de la dernière image "mariadb",
+# on init une variable "MYSQL_ROOT_PASSWORD = root",
+# sur le port 3306 de notre machine, qui pointe sur le port 3306 de notre "container".
 
 db:
-  image: mariadb:latest
-  container_name: wpmariadb
-  environment:
-    MYSQL_ROOT_PASSWORD: root
-  ports:
-    - 3306:3306
+image: mariadb:latest
+container_name: wpmariadb
+environment:
+MYSQL_ROOT_PASSWORD: root
+ports:
+- 3306:3306
+
+# On donne le nom "wpphpmyadmin" à ce "container",
+# à partir de l'image "phpmyadmin/phpmyadmin",
+# on le lie à notre bdd nommée "db",
+# on init 2 variables "MYSQL_USERNAME= root" et "MYSQL_ROOT_PASSWORD=root",
+# sur le port 8080 de notre machine, qui pointe sur le port 80 de notre "container",
+# on crée un volume "/sessions".
 
 phpmyadmin:
-  image: phpmyadmin/phpmyadmin
-  container_name: wpphpmyadmin
-  links:
-    - db:db
-  environment:
-    MYSQL_USERNAME: root
-    MYSQL_ROOT_PASSWORD: root
-  restart: always
-  ports:
-    - 8080:80
-  volumes:
-    - /sessions
+image: phpmyadmin/phpmyadmin
+container_name: wpphpmyadmin
+links:
+- db:db
+environment:
+MYSQL_USERNAME: root
+MYSQL_ROOT_PASSWORD: root
+restart: always
+ports:
+- 8080:80
+volumes:
+- /sessions
