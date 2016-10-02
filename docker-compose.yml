@@ -1,0 +1,31 @@
+wordpress:
+  image: wordpress
+  links:
+    - db:mysql
+  ports:
+    - 8081:80
+  volumes:
+    # copy in path windows
+    - ~/Documents/docker/wordpress/:/var/www/html/
+
+db:
+  image: mariadb:latest
+  container_name: wpmariadb
+  environment:
+    MYSQL_ROOT_PASSWORD: root
+  ports:
+    - 3306:3306
+
+phpmyadmin:
+  image: phpmyadmin/phpmyadmin
+  container_name: wpphpmyadmin
+  links:
+    - db:db
+  environment:
+    MYSQL_USERNAME: root
+    MYSQL_ROOT_PASSWORD: root
+  restart: always
+  ports:
+    - 8080:80
+  volumes:
+    - /sessions
