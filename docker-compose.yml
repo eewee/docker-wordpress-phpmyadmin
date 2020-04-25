@@ -17,35 +17,70 @@
 # sur le port 8080 de notre machine, qui pointe sur le port 80 de notre "container",
 # on crée un volume "/sessions".
 #-----------------------------------------------------------------------------------
+# Ressources :
+# https://docs.docker.com/compose/compose-file/#image
+# https://docs.docker.com/compose/compose-file/#restart
+# https://docs.docker.com/compose/compose-file/#volumes
+# https://docs.docker.com/compose/compose-file/#environment
+#-----------------------------------------------------------------------------------
 
-wordpress:
-    image: wordpress
-    links:
-        - "db:mysql"
-    ports:
-        - "8081:80"
-    volumes:
-        # copy in path windows
-        - ~/Documents/docker/wordpress/:/var/www/html/
+# Version a utiliser pour le format du fichier docker-compose
+version: "3"
 
-db:
+services :
+
+  # CONTAINER - MYSQL :
+  # https://hub.docker.com/_/mysql
+  db:
     image: mariadb:latest
-    container_name: wpmariadb
-    environment:
-        MYSQL_ROOT_PASSWORD: root
-    ports:
-        - "3306:3306"
-
-phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: wpphpmyadmin
-    links:
-        - "db:db"
-    environment:
-        MYSQL_USERNAME: root
-        MYSQL_ROOT_PASSWORD: root
+    container_name: wp_mariadb
     restart: always
-    ports:
-        - "8080:80"
     volumes:
-        - "/sessions"
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    networks:
+      - wp
+
+  # CONTAINER - WORDPRESS :
+  # https://hub.docker.com/_/wordpress
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress
+    container_name: wp_wordpress
+    restart: always
+    volumes: ["./:/var/www/html"]
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+    ports:
+      - "80:80"
+    networks:
+      - wp
+
+  # CONTAINER - PHPMYADMIN :
+  # https://hub.docker.com/r/phpmyadmin/phpmyadmin
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin
+    container_name: wp_phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - "8080:80"
+    networks:
+      - wp
+
+networks:
+  wp:
+
+volumes:
+  db_data:
