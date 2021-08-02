@@ -25,12 +25,11 @@
 #-----------------------------------------------------------------------------------
 
 # Version a utiliser pour le format du fichier docker-compose
-version: "3"
+version: "3.9"
 
 services :
 
-  # CONTAINER - MYSQL :
-  # https://hub.docker.com/_/mysql
+  # CONTAINER - MYSQL : https://hub.docker.com/_/mysql
   db:
     image: mariadb:latest
     container_name: wp_mariadb
@@ -45,8 +44,7 @@ services :
     networks:
       - wp
 
-  # CONTAINER - WORDPRESS :
-  # https://hub.docker.com/_/wordpress
+  # CONTAINER - WORDPRESS : https://hub.docker.com/_/wordpress
   wordpress:
     depends_on:
       - db
@@ -62,9 +60,10 @@ services :
       - "80:80"
     networks:
       - wp
+    links:
+      - "maildev:maildev"
 
-  # CONTAINER - PHPMYADMIN :
-  # https://hub.docker.com/r/phpmyadmin/phpmyadmin
+  # CONTAINER - PHPMYADMIN : https://hub.docker.com/r/phpmyadmin/phpmyadmin
   phpmyadmin:
     depends_on:
       - db
@@ -76,6 +75,17 @@ services :
       MYSQL_ROOT_PASSWORD: password
     ports:
       - "8080:80"
+    networks:
+      - wp
+
+  maildev:
+    image: maildev/maildev
+    container_name: wp_maildev
+    command: bin/maildev --web 80 --smtp 25 #--hide-extensions STARTTLS
+    ports:
+       - "1080:80"  # Interface web
+       - "1025:25"  # SMTP
+    restart: always
     networks:
       - wp
 
