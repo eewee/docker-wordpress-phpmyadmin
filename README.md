@@ -1,9 +1,9 @@
 # Docker-composer pour Wordpress :
 Le but étant de pouvoir utiliser, les images suivantes avec Docker :
-* 1 Wordpress
+* 1 [Wordpress](https://fr.wordpress.org/)
 * 1 db
-* 1 PhpMyAdmin
-* 1 MailDev
+* 1 [PhpMyAdmin](https://www.phpmyadmin.net/)
+* 1 [MailDev](https://maildev.github.io/maildev/)
 
 # Config :
 * On se place dans le dossier ne contenant que le fichier "docker-compose.yml".
